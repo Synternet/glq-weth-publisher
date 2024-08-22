@@ -1,4 +1,4 @@
-name: StreamSculpt image build and release automation workflow
+name: GLQ WETH Publisher image build and release automation workflow
 
 on:
   push:
