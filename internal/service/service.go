@@ -43,7 +43,7 @@ type PublisherConfig struct {
 
 type Message struct {
 	Postfix string
-	Msg     types.DecodedEthLogEvent
+	Msg     types.StreamData
 }
 
 type MessageChannel chan Message
@@ -183,7 +183,7 @@ func (s SubscriberService) ProcessTxLogEventFromStream(data []byte) error {
 	outgoing.Sig = event.Sig
 	s.msgChan <- Message{
 		Postfix: ".GLQ-WETH",
-		Msg:     outgoing,
+		Msg:     streamData,
 	}
 
 	return nil
