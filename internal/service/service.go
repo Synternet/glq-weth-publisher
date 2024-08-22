@@ -170,8 +170,11 @@ func (s SubscriberService) ProcessTxLogEventFromStream(data []byte) error {
 		log.Fatalf("failed to decode %s event log: %v", event.Name, err)
 	}
 
-	amount0 := outgoing.Data["amount0"].(float64)
-	amount1 := outgoing.Data["amount1"].(float64)
+	amount0BigInt := outgoing.Data["amount0"].(*big.Int)
+	amount1BigInt := outgoing.Data["amount1"].(*big.Int)
+
+	amount0, _ := new(big.Float).SetInt(amount0BigInt).Float64()
+	amount1, _ := new(big.Float).SetInt(amount1BigInt).Float64()
 
 	streamData := types.StreamData{}
 	streamData.GlqWeth = amount1 / amount0
