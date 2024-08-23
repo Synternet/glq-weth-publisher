@@ -250,7 +250,7 @@ func (s PublisherService) Serve() {
 				subject := fmt.Sprintf("%s%s", s.cfg.SubjectPrefix, msg.Postfix)
 				if err := s.nats.PublishAsJSON(groupCtx, subject, msg.Msg); err != nil {
 					log.Println(err.Error())
-					return err
+					// return err
 				}
 			case <-groupCtx.Done():
 				return groupCtx.Err()
