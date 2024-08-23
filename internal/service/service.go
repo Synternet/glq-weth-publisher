@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"math/big"
 	"os"
 	"os/signal"
@@ -143,7 +144,6 @@ func (s SubscriberService) ProcessTxLogEventFromStream(data []byte) error {
 		log.Fatalf("failed to decode log data: %v", err)
 		return nil
 	}
-	log.Println(string(data))
 
 	outgoing := types.DecodedEthLogEvent{}
 	outgoing.Address = incoming.Address
@@ -164,22 +164,26 @@ func (s SubscriberService) ProcessTxLogEventFromStream(data []byte) error {
 		log.Fatalf("failed to get event by ID: %v", err)
 	}
 
-	outgoing.Data = make(map[string]interface{})
-	err = abi.UnpackIntoMap(outgoing.Data, event.Name, eventData)
+	tempData := make(map[string]interface{})
+	err = abi.UnpackIntoMap(tempData, event.Name, eventData)
 	if err != nil {
 		log.Fatalf("failed to decode %s event log: %v", event.Name, err)
 	}
+	amount0BigInt, _ := new(big.Float).SetInt(tempData["amount0"].(*big.Int)).Float64()
+	amount1BigInt, _ := new(big.Float).SetInt(tempData["amount1"].(*big.Int)).Float64()
+	outgoing.Data = types.Data{
+		Amount0: amount0BigInt,
+		Amount1: amount1BigInt,
+	}
 
-	amount0BigInt := outgoing.Data["amount0"].(*big.Int)
-	amount1BigInt := outgoing.Data["amount1"].(*big.Int)
-
-	amount0, _ := new(big.Float).SetInt(amount0BigInt).Float64()
-	amount1, _ := new(big.Float).SetInt(amount1BigInt).Float64()
+	amount0 := outgoing.Data.Amount0
+	amount1 := outgoing.Data.Amount1
 
 	streamData := types.StreamData{}
-	streamData.GlqWeth = amount1 / amount0
-	streamData.WethGlq = amount0 / amount1
+	streamData.GlqWeth = math.Abs(amount1 / amount0)
+	streamData.WethGlq = math.Abs(amount0 / amount1)
 
+	log.Println(tempData, streamData)
 	outgoing.Sig = event.Sig
 	s.msgChan <- Message{
 		Postfix: ".GLQ-WETH",

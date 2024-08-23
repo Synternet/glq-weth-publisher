@@ -17,16 +17,24 @@ type EthLogEvent struct {
 }
 
 type DecodedEthLogEvent struct {
-	Address          string                 `json:"address"`
-	Sig              string                 `json:"sig"`
-	Topics           []string               `json:"topics"`
-	Data             map[string]interface{} `json:"data"`
-	BlockNumber      string                 `json:"blockNumber"`
-	TransactionHash  string                 `json:"transactionHash"`
-	TransactionIndex string                 `json:"transactionIndex"`
-	BlockHash        string                 `json:"blockHash"`
-	LogIndex         string                 `json:"logIndex"`
-	Removed          bool                   `json:"removed"`
+	Address          string   `json:"address"`
+	Sig              string   `json:"sig"`
+	Topics           []string `json:"topics"`
+	Data             Data     `json:"data"`
+	BlockNumber      string   `json:"blockNumber"`
+	TransactionHash  string   `json:"transactionHash"`
+	TransactionIndex string   `json:"transactionIndex"`
+	BlockHash        string   `json:"blockHash"`
+	LogIndex         string   `json:"logIndex"`
+	Removed          bool     `json:"removed"`
+}
+
+type Data struct {
+	Amount0      float64 `json:"amount0"`
+	Amount1      float64 `json:"amount1"`
+	Liquidity    float64 `json:"liquidity"`
+	SqrtPriceX96 float64 `json:"sqrtPriceX96"`
+	Tick         int64   `json:"tick"`
 }
 
 type StreamData struct {
